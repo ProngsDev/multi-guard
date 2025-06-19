@@ -2,7 +2,6 @@
 pragma solidity ^0.8.20;
 
 contract MultiSigWallet {
-
     //errors
     error InvalidNumberOfOwners(uint256 numOwners);
     error InvalidThreshold(uint256 threshold);
@@ -71,15 +70,7 @@ contract MultiSigWallet {
     }
 
     function submitTransaction(address to, uint256 value, bytes memory data) public onlyOwner {
-        transactions.push(
-            Transaction({
-                to: to,
-                value: value,
-                data: data,
-                executed: false,
-                numConfirmations: 0
-            })
-        );
+        transactions.push(Transaction({to: to, value: value, data: data, executed: false, numConfirmations: 0}));
         emit TransactionSubmitted(transactions.length - 1, to, value, data);
     }
 
@@ -99,7 +90,7 @@ contract MultiSigWallet {
         Transaction storage txn = transactions[txIndex];
         require(txn.numConfirmations >= threshold, "Not enough confirmations");
         txn.executed = true;
-        (bool success, ) = txn.to.call{value: txn.value}(txn.data);
+        (bool success,) = txn.to.call{value: txn.value}(txn.data);
         require(success, "Transaction failed");
         emit TransactionExecuted(txIndex);
     }

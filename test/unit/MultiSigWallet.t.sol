@@ -56,7 +56,7 @@ contract MultiSigWalletTest is Test {
 
         // Test too many owners (>10)
         address[] memory tooManyOwners = new address[](11);
-        for (uint i = 0; i < 11; i++) {
+        for (uint256 i = 0; i < 11; i++) {
             tooManyOwners[i] = address(uint160(i + 1));
         }
         vm.expectRevert(abi.encodeWithSelector(MultiSigWallet.InvalidNumberOfOwners.selector, 11));
@@ -155,7 +155,7 @@ contract MultiSigWalletTest is Test {
 
         assertTrue(multiSigWallet.confirmations(0, owner1));
 
-        (, , , , uint256 numConfirmations) = multiSigWallet.transactions(0);
+        (,,,, uint256 numConfirmations) = multiSigWallet.transactions(0);
         assertEq(numConfirmations, 1);
     }
 
@@ -230,7 +230,7 @@ contract MultiSigWalletTest is Test {
         multiSigWallet.executeTransaction(0);
 
         // Check transaction is marked as executed
-        (, , , bool executed, ) = multiSigWallet.transactions(0);
+        (,,, bool executed,) = multiSigWallet.transactions(0);
         assertTrue(executed);
 
         // Check ETH was transferred
@@ -318,21 +318,21 @@ contract MultiSigWalletTest is Test {
         vm.prank(owner1);
         multiSigWallet.confirmTransaction(0);
 
-        (, , , , uint256 numConfirmations) = multiSigWallet.transactions(0);
+        (,,,, uint256 numConfirmations) = multiSigWallet.transactions(0);
         assertEq(numConfirmations, 1);
 
         // Second confirmation
         vm.prank(owner2);
         multiSigWallet.confirmTransaction(0);
 
-        (, , , , numConfirmations) = multiSigWallet.transactions(0);
+        (,,,, numConfirmations) = multiSigWallet.transactions(0);
         assertEq(numConfirmations, 2);
 
         // Third confirmation
         vm.prank(owner3);
         multiSigWallet.confirmTransaction(0);
 
-        (, , , , numConfirmations) = multiSigWallet.transactions(0);
+        (,,,, numConfirmations) = multiSigWallet.transactions(0);
         assertEq(numConfirmations, 3);
     }
     // ============ Receive Function Tests ============
@@ -342,7 +342,7 @@ contract MultiSigWalletTest is Test {
 
         // Send ETH to the wallet
         vm.deal(address(this), 5 ether);
-        (bool success, ) = address(multiSigWallet).call{value: 2 ether}("");
+        (bool success,) = address(multiSigWallet).call{value: 2 ether}("");
         assertTrue(success);
 
         assertEq(address(multiSigWallet).balance, initialBalance + 2 ether);
@@ -371,7 +371,7 @@ contract MultiSigWalletTest is Test {
         multiSigWallet.executeTransaction(0);
 
         // 5. Verify final state
-        (, , , bool executed, uint256 numConfirmations) = multiSigWallet.transactions(0);
+        (,,, bool executed, uint256 numConfirmations) = multiSigWallet.transactions(0);
         assertTrue(executed);
         assertEq(numConfirmations, 2);
         assertEq(recipient.balance, initialRecipientBalance + 2 ether);
@@ -402,9 +402,9 @@ contract MultiSigWalletTest is Test {
         multiSigWallet.confirmTransaction(1);
 
         // Check states
-        (, , , bool executed0, ) = multiSigWallet.transactions(0);
-        (, , , bool executed1, ) = multiSigWallet.transactions(1);
-        (, , , bool executed2, ) = multiSigWallet.transactions(2);
+        (,,, bool executed0,) = multiSigWallet.transactions(0);
+        (,,, bool executed1,) = multiSigWallet.transactions(1);
+        (,,, bool executed2,) = multiSigWallet.transactions(2);
 
         assertTrue(executed0);
         assertFalse(executed1);
@@ -428,7 +428,7 @@ contract MultiSigWalletTest is Test {
         vm.prank(owner1);
         singleThresholdWallet.executeTransaction(0);
 
-        (, , , bool executed, ) = singleThresholdWallet.transactions(0);
+        (,,, bool executed,) = singleThresholdWallet.transactions(0);
         assertTrue(executed);
     }
 
@@ -459,7 +459,7 @@ contract MultiSigWalletTest is Test {
         vm.prank(owner1);
         maxThresholdWallet.executeTransaction(0);
 
-        (, , , bool executed, ) = maxThresholdWallet.transactions(0);
+        (,,, bool executed,) = maxThresholdWallet.transactions(0);
         assertTrue(executed);
     }
 }
