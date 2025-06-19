@@ -13,7 +13,11 @@ contract MultiSigWallet {
     error AlreadyExecuted();
     error AlreadyConfirmed();
 
-    
+    //events
+    event TransactionSubmitted(uint256 txIndex, address indexed to, uint256 value, bytes data);
+    event TransactionConfirmed(uint256 txIndex, address indexed owner);
+    event TransactionExecuted(uint256 txIndex);
+
     //types
     struct Transaction {
         address to;
@@ -48,7 +52,7 @@ contract MultiSigWallet {
     }
 
     modifier notConfirmed(uint256 txIndex) {
-        require(transactions[txIndex].numConfirmations < threshold, AlreadyConfirmed());
+        require(!confirmations[txIndex][msg.sender], AlreadyConfirmed());
         _;
     }
 
@@ -66,7 +70,18 @@ contract MultiSigWallet {
         threshold = _threshold;
     }
 
-    function submitTransaction() public onlyOwner {}
+    function submitTransaction(address to, uint256 value, bytes memory data) public onlyOwner {
+        transactions.push(
+            Transaction({
+                to: to,
+                value: value,
+                data: data,
+                executed: false,
+                numConfirmations: 0
+            })
+        );
+        emit TransactionSubmitted(transactions.length - 1, to, value, data);
+    }
 
     function confirmTransaction(uint256 txIndex)
         public
@@ -74,9 +89,20 @@ contract MultiSigWallet {
         txExists(txIndex)
         notExecuted(txIndex)
         notConfirmed(txIndex)
-    {}
+    {
+        confirmations[txIndex][msg.sender] = true;
+        transactions[txIndex].numConfirmations++;
+        emit TransactionConfirmed(txIndex, msg.sender);
+    }
 
-    function executeTransaction(uint256 txIndex) public onlyOwner txExists(txIndex) notExecuted(txIndex) {}
+    function executeTransaction(uint256 txIndex) public onlyOwner txExists(txIndex) notExecuted(txIndex) {
+        Transaction storage txn = transactions[txIndex];
+        require(txn.numConfirmations >= threshold, "Not enough confirmations");
+        txn.executed = true;
+        (bool success, ) = txn.to.call{value: txn.value}(txn.data);
+        require(success, "Transaction failed");
+        emit TransactionExecuted(txIndex);
+    }
 
     receive() external payable {}
 }
