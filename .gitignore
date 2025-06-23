@@ -12,3 +12,32 @@ docs/
 
 # Dotenv file
 .env
+
+# Deployment files (keep templates and README)
+deployments/*.json
+!deployments/README.md
+
+# Node modules (if any)
+node_modules/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Coverage reports
+coverage/
+lcov.info
+
+# Temporary files
+*.tmp
+*.temp

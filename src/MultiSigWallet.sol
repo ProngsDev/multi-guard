@@ -58,13 +58,16 @@ contract MultiSigWallet {
     constructor(address[] memory _owners, uint256 _threshold) {
         require(_owners.length > 0 && _owners.length <= 10, InvalidNumberOfOwners(_owners.length));
         require(_threshold > 0 && _threshold <= _owners.length, InvalidThreshold(_threshold));
-        for (uint256 i = 0; i < _owners.length; i++) {
+        for (uint256 i = 0; i < _owners.length;) {
             address owner = _owners[i];
             require(owner != address(0), ZeroAddress());
             require(!isOwner[owner], NotUnique(owner));
 
             isOwner[owner] = true;
             owners.push(owner);
+            unchecked {
+                 ++i;
+            }
         }
         threshold = _threshold;
     }
