@@ -14,19 +14,19 @@ contract DeployWalletFactory is Script {
     function run() external returns (WalletFactory factory) {
         // Start broadcasting transactions
         vm.startBroadcast();
-        
+
         // Deploy the WalletFactory
         factory = new WalletFactory();
-        
+
         // Stop broadcasting
         vm.stopBroadcast();
-        
+
         // Log deployment information
         console.log("WalletFactory deployed at:", address(factory));
         console.log("Deployer:", msg.sender);
         console.log("Max owners per wallet:", factory.MAX_OWNERS());
         console.log("Min owners per wallet:", factory.MIN_OWNERS());
-        
+
         return factory;
     }
 }

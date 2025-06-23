@@ -66,7 +66,7 @@ contract MultiSigWallet {
             isOwner[owner] = true;
             owners.push(owner);
             unchecked {
-                 ++i;
+                ++i;
             }
         }
         threshold = _threshold;
